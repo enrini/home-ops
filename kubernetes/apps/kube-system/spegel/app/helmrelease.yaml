@@ -16,4 +16,4 @@ spec:
       registry:
         hostPort: 29999
     serviceMonitor:
-      enabled: false
+      enabled: true
