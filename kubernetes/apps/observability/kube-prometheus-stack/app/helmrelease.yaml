@@ -4,17 +4,41 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: kube-prometheus-stack
+  namespace: observability
 spec:
   interval: 30m
   chartRef:
     kind: OCIRepository
     name: kube-prometheus-stack
-  url: https://prometheus-community.github.io/helm-charts
-values:
-  # This prevents Prometheus from crashing while waiting for Ceph storage
-  prometheus:
-    prometheusSpec:
-      storageSpec: null
-  alertmanager:
-    alertmanagerSpec:
-      storage: null
+  values:
+    cleanPrometheusOperatorObjectNames: true
+    alertmanager:
+      alertmanagerSpec:
+        storage: null # Disabling storage until Ceph is installed
+    kubeEtcd:
+      service:
+        selector:
+          component: kube-apiserver
+    kubeProxy:
+      enabled: false
+    prometheus:
+      prometheusSpec:
+        podMonitorSelectorNilUsesHelmValues: false
+        probeSelectorNilUsesHelmValues: false
+        ruleSelectorNilUsesHelmValues: false
+        scrapeConfigSelectorNilUsesHelmValues: false
+        serviceMonitorSelectorNilUsesHelmValues: false
+        retention: 30d
+        retentionSize: 50GB
+        resources:
+          requests:
+            cpu: 100m
+          limits:
+            memory: 2000Mi
+        storageSpec: null # Disabling storage until Ceph is installed
+    prometheus-node-exporter:
+      fullnameOverride: node-exporter
+    kube-state-metrics:
+      fullnameOverride: kube-state-metrics
+    grafana:
+      enabled: false
