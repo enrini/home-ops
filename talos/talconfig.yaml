@@ -39,21 +39,6 @@ nodes:
         mtu: 1500
         vip:
           ip: "192.168.1.133"
-    patches:
-      # Encrypt system disk with TPM
-      - |-
-        machine:
-          systemDiskEncryption:
-            state:
-              provider: luks2
-              keys:
-                - slot: 0
-                  tpm: {}
-            ephemeral:
-              provider: luks2
-              keys:
-                - slot: 0
-                  tpm: {}
   - hostname: "k8s-1"
     ipAddress: "192.168.1.130"
     installDisk: "/dev/nvme0n1"
@@ -73,21 +58,6 @@ nodes:
         mtu: 1500
         vip:
           ip: "192.168.1.133"
-    patches:
-      # Encrypt system disk with TPM
-      - |-
-        machine:
-          systemDiskEncryption:
-            state:
-              provider: luks2
-              keys:
-                - slot: 0
-                  tpm: {}
-            ephemeral:
-              provider: luks2
-              keys:
-                - slot: 0
-                  tpm: {}
   - hostname: "k8s-2"
     ipAddress: "192.168.1.131"
     installDisk: "/dev/nvme0n1"
@@ -107,21 +77,6 @@ nodes:
         mtu: 1500
         vip:
           ip: "192.168.1.133"
-    patches:
-      # Encrypt system disk with TPM
-      - |-
-        machine:
-          systemDiskEncryption:
-            state:
-              provider: luks2
-              keys:
-                - slot: 0
-                  tpm: {}
-            ephemeral:
-              provider: luks2
-              keys:
-                - slot: 0
-                  tpm: {}
 
 # Global patches
 patches:
