@@ -1,0 +1,20 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+spec:
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: kube-prometheus-stack
+  url: https://prometheus-community.github.io/helm-charts
+values:
+  # This prevents Prometheus from crashing while waiting for Ceph storage
+  prometheus:
+    prometheusSpec:
+      storageSpec: null
+  alertmanager:
+    alertmanagerSpec:
+      storage: null
