@@ -5,3 +5,8 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./ocirepository.yaml
+spec:
+  dependsOn:
+    - name: rook-ceph-operator
+    - name: snapshot-controller
+      namespace: flux-system
