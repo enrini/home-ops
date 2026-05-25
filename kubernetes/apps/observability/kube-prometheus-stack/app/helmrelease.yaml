@@ -14,7 +14,13 @@ spec:
     cleanPrometheusOperatorObjectNames: true
     alertmanager:
       alertmanagerSpec:
-        storage: null # Disabling storage until Ceph is installed
+        storage:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: ceph-block
+              resources:
+                requests:
+                  storage: 1Gi
     kubeEtcd:
       service:
         selector:
@@ -35,7 +41,13 @@ spec:
             cpu: 100m
           limits:
             memory: 2000Mi
-        storageSpec: null # Disabling storage until Ceph is installed
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: ceph-block
+              resources:
+                requests:
+                  storage: 50Gi
     prometheus-node-exporter:
       fullnameOverride: node-exporter
     kube-state-metrics:
