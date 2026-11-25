@@ -27,3 +27,4 @@ resources:
   - ./seerr/ks.yaml
   - ./recyclarr/ks.yaml
   - ./plex-auto-languages/ks.yaml
+  - ./cross-seed/ks.yaml
