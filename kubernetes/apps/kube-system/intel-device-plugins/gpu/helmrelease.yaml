@@ -1,0 +1,22 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: intel-device-plugins-gpu
+spec:
+  chart:
+    spec:
+      chart: intel-device-plugins-gpu
+      version: 0.37.1
+      sourceRef:
+        kind: HelmRepository
+        name: intel
+  interval: 1h
+  values:
+    name: intel-gpu-plugin
+    sharedDevNum: 10
+    nodeFeatureRule: true
+    enableMonitoring: true
+    nodeSelector:
+      intel.feature.node.kubernetes.io/gpu: "true"

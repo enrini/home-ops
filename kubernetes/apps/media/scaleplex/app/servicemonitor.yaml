@@ -1,0 +1,28 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/servicemonitor_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: scaleplex-orchestrator
+  namespace: media
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: scaleplex-orchestrator
+  endpoints:
+    - port: http
+      path: /metrics
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/servicemonitor_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: scaleplex-worker
+  namespace: media
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: scaleplex-worker
+  endpoints:
+    - port: http
+      path: /metrics

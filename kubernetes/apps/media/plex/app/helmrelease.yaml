@@ -1,0 +1,113 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: plex
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: plex
+  interval: 1h
+  values:
+    controllers:
+      plex:
+        strategy: Recreate
+        containers:
+          app:
+            image:
+              repository: lscr.io/linuxserver/plex
+              tag: 1.43.5.11079-b3b13e506-ls334
+            env:
+              PUID: "1000"
+              PGID: "100"
+              TZ: Europe/London
+              VERSION: docker
+              # Stage 2: Uncomment after claiming Plex with your Lifetime Plex Pass and enabling HW transcoding
+              # DOCKER_MODS: ghcr.io/varashi/scaleplex_pms_dockermod:sha-0e6edae
+              # LOCAL_RELAY_PORT: "32499"
+              # SCALEPLEX_ORCHESTRATOR_URL: http://scaleplex-orchestrator.media.svc.cluster.local:3500
+            probes:
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /identity
+                    port: &port 32400
+                  periodSeconds: 5
+                  failureThreshold: 30
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /identity
+                    port: *port
+                  periodSeconds: 10
+                  timeoutSeconds: 2
+                  failureThreshold: 3
+              readiness: *probes
+            resources:
+              requests:
+                cpu: 100m
+                memory: 1Gi
+                gpu.intel.com/i915: 1
+              limits:
+                memory: 4Gi
+                gpu.intel.com/i915: 1
+    defaultPodOptions:
+      securityContext:
+        supplementalGroups:
+          - 44
+          - 105
+          - 568
+    service:
+      app:
+        type: LoadBalancer
+        annotations:
+          lbipam.cilium.io/ips: "192.168.1.137"
+        externalTrafficPolicy: Local
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
+    persistence:
+      config:
+        type: persistentVolumeClaim
+        forceRename: plex-config
+        storageClass: ceph-block
+        accessMode: ReadWriteOnce
+        size: 10Gi
+        retain: true
+        globalMounts:
+          - path: /config
+      data:
+        type: persistentVolumeClaim
+        forceRename: media-data
+        storageClass: ceph-filesystem
+        accessMode: ReadWriteMany
+        size: 50Gi
+        retain: true
+        globalMounts:
+          - path: /data
+      transcode:
+        type: persistentVolumeClaim
+        forceRename: plex-transcode
+        storageClass: ceph-filesystem-scratch
+        accessMode: ReadWriteMany
+        size: 20Gi
+        retain: true
+        globalMounts:
+          - path: /transcode

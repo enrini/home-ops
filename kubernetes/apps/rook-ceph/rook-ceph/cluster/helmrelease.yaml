@@ -89,6 +89,10 @@ spec:
               failureDomain: host
               replicated:
                 size: 3
+            - name: scratch
+              failureDomain: host
+              replicated:
+                size: 1
           metadataServer:
             activeCount: 1
             activeStandby: true
