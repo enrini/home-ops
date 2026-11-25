@@ -17,7 +17,7 @@ spec:
           app:
             image:
               repository: ghcr.io/home-operations/bazarr
-              tag: v1.6.2
+              tag: 1.6.2
             env:
               TZ: Europe/London
               BAZARR__PORT: &port 6767

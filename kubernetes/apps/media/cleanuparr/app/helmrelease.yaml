@@ -17,7 +17,7 @@ spec:
           app:
             image:
               repository: ghcr.io/cleanuparr/cleanuparr
-              tag: v2.11.2
+              tag: 2.11.2
             env:
               TZ: Europe/London
               PORT: &port 11011
