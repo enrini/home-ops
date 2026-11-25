@@ -21,6 +21,11 @@ spec:
             env:
               TZ: Europe/London
               RADARR__APP__INSTANCENAME: Radarr
+              RADARR__AUTH__APIKEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: arr-api-keys
+                    key: RADARR_API_KEY
               RADARR__SERVER__PORT: &port 7878
               RADARR__LOG__LEVEL: info
               RADARR__POSTGRES__HOST: postgres-media-rw.media.svc.cluster.local

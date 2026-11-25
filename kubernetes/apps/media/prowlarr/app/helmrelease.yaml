@@ -21,6 +21,11 @@ spec:
             env:
               TZ: Europe/London
               PROWLARR__APP__INSTANCENAME: Prowlarr
+              PROWLARR__AUTH__APIKEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: arr-api-keys
+                    key: PROWLARR_API_KEY
               PROWLARR__SERVER__PORT: &port 9696
               PROWLARR__LOG__LEVEL: info
               PROWLARR__POSTGRES__HOST: postgres-media-rw.media.svc.cluster.local

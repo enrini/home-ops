@@ -9,6 +9,7 @@ components:
 
 resources:
   - ./namespace.yaml
+  - ./arr-api-keys.sops.yaml
   - ./plex/ks.yaml
   - ./scaleplex/ks.yaml
   - ./postgres/ks.yaml

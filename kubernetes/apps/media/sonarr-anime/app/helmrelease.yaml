@@ -21,6 +21,11 @@ spec:
             env:
               TZ: Europe/London
               SONARR__APP__INSTANCENAME: Sonarr Anime
+              SONARR__AUTH__APIKEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: arr-api-keys
+                    key: SONARR_ANIME_API_KEY
               SONARR__SERVER__PORT: &port 8989
               SONARR__LOG__LEVEL: info
               SONARR__POSTGRES__HOST: postgres-media-rw.media.svc.cluster.local
