@@ -13,6 +13,40 @@ spec:
     controllers:
       unpackerr:
         strategy: RollingUpdate
+        initContainers:
+          init-dirs:
+            image:
+              repository: docker.io/library/busybox
+              tag: "1.37"
+            command:
+              - /bin/sh
+              - -c
+            args:
+              - >-
+                mkdir -p
+                /data/torrents/movies
+                /data/torrents/tv
+                /data/torrents/anime
+                /data/torrents/cross-seed
+                /data/usenet/incomplete
+                /data/usenet/complete/movies
+                /data/usenet/complete/tv
+                /data/usenet/complete/anime
+                /data/media/movies
+                /data/media/tv
+                /data/media/anime
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+            resources:
+              requests:
+                cpu: 10m
+                memory: 16Mi
+              limits:
+                memory: 64Mi
         containers:
           app:
             image:
