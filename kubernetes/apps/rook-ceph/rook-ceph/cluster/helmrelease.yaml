@@ -9,6 +9,7 @@ spec:
     kind: OCIRepository
     name: rook-ceph-cluster
   interval: 1h
+  timeout: 15m
   values:
     cephClusterSpec:
       cleanupPolicy:
@@ -92,7 +93,7 @@ spec:
             - name: scratch
               failureDomain: host
               replicated:
-                size: 1
+                size: 2
           metadataServer:
             activeCount: 1
             activeStandby: true
