@@ -23,10 +23,9 @@ spec:
               PGID: "100"
               TZ: Europe/London
               VERSION: docker
-              # Stage 2: Uncomment after claiming Plex with your Lifetime Plex Pass and enabling HW transcoding
-              # DOCKER_MODS: ghcr.io/varashi/scaleplex_pms_dockermod:sha-0e6edae
-              # LOCAL_RELAY_PORT: "32499"
-              # SCALEPLEX_ORCHESTRATOR_URL: http://scaleplex-orchestrator.media.svc.cluster.local:3500
+              DOCKER_MODS: ghcr.io/varashi/scaleplex_pms_dockermod:sha-0e6edae
+              LOCAL_RELAY_PORT: "32499"
+              SCALEPLEX_ORCHESTRATOR_URL: http://scaleplex-orchestrator.media.svc.cluster.local:3500
             probes:
               startup:
                 enabled: true
