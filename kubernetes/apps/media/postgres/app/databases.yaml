@@ -1,0 +1,120 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/database_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: prowlarr-main
+  namespace: media
+spec:
+  name: prowlarr_main
+  owner: app
+  cluster:
+    name: postgres-media
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/database_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: prowlarr-log
+  namespace: media
+spec:
+  name: prowlarr_log
+  owner: app
+  cluster:
+    name: postgres-media
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/database_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: radarr-main
+  namespace: media
+spec:
+  name: radarr_main
+  owner: app
+  cluster:
+    name: postgres-media
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/database_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: radarr-log
+  namespace: media
+spec:
+  name: radarr_log
+  owner: app
+  cluster:
+    name: postgres-media
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/database_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: sonarr-main
+  namespace: media
+spec:
+  name: sonarr_main
+  owner: app
+  cluster:
+    name: postgres-media
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/database_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: sonarr-log
+  namespace: media
+spec:
+  name: sonarr_log
+  owner: app
+  cluster:
+    name: postgres-media
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/database_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: sonarr-anime-main
+  namespace: media
+spec:
+  name: sonarr_anime_main
+  owner: app
+  cluster:
+    name: postgres-media
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/database_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: sonarr-anime-log
+  namespace: media
+spec:
+  name: sonarr_anime_log
+  owner: app
+  cluster:
+    name: postgres-media
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/database_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: bazarr
+  namespace: media
+spec:
+  name: bazarr
+  owner: app
+  cluster:
+    name: postgres-media
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/database_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: seerr
+  namespace: media
+spec:
+  name: seerr
+  owner: app
+  cluster:
+    name: postgres-media

@@ -1,0 +1,26 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/cluster_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgres-media
+  namespace: media
+spec:
+  instances: 3
+  storage:
+    size: 5Gi
+    storageClass: ceph-block
+  affinity:
+    podAntiAffinityType: preferred
+  monitoring:
+    enablePodMonitor: true
+  bootstrap:
+    initdb:
+      database: app
+      owner: app
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi

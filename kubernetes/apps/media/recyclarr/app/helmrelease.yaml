@@ -1,0 +1,115 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: recyclarr
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: recyclarr
+  interval: 1h
+  values:
+    controllers:
+      recyclarr:
+        type: cronjob
+        cronjob:
+          schedule: "@daily"
+          # Set suspend: false after creating recyclarr-secret.sops.yaml with your *arr API keys
+          suspend: true
+          concurrencyPolicy: Forbid
+          successfulJobsHistory: 1
+          failedJobsHistory: 1
+        containers:
+          app:
+            image:
+              repository: ghcr.io/recyclarr/recyclarr
+              tag: 8.8.1
+            args:
+              - sync
+            env:
+              TZ: Europe/London
+            envFrom:
+              - secretRef:
+                  name: recyclarr-secret
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+            resources:
+              requests:
+                cpu: 25m
+                memory: 64Mi
+              limits:
+                memory: 256Mi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 100
+        fsGroup: 100
+        fsGroupChangePolicy: OnRootMismatch
+    configMaps:
+      config:
+        data:
+          recyclarr.yml: |-
+            radarr:
+              movies:
+                base_url: http://radarr.media.svc.cluster.local:7878
+                api_key: !env_var RADARR_API_KEY
+                media_naming:
+                  folder: plex-imdb
+                  movie:
+                    rename: true
+                    standard: plex-imdb
+                include:
+                  - template: radarr-quality-definition-movie
+                  - template: radarr-quality-profile-hd-bluray-web
+                  - template: radarr-custom-formats-hd-bluray-web
+                  - template: radarr-quality-profile-uhd-bluray-web
+                  - template: radarr-custom-formats-uhd-bluray-web
+            sonarr:
+              tv:
+                base_url: http://sonarr.media.svc.cluster.local:8989
+                api_key: !env_var SONARR_API_KEY
+                media_naming:
+                  series: plex-tvdb
+                  season: default
+                  episodes:
+                    rename: true
+                    standard: default
+                    daily: default
+                    anime: default
+                include:
+                  - template: sonarr-quality-definition-series
+                  - template: sonarr-quality-profile-web-1080p-v4
+                  - template: sonarr-v4-custom-formats-web-1080p
+              anime:
+                base_url: http://sonarr-anime.media.svc.cluster.local:8989
+                api_key: !env_var SONARR_ANIME_API_KEY
+                media_naming:
+                  series: plex-tvdb
+                  season: default
+                  episodes:
+                    rename: true
+                    standard: default
+                    daily: default
+                    anime: default
+                include:
+                  - template: sonarr-quality-definition-anime
+                  - template: sonarr-v4-quality-profile-anime
+                  - template: sonarr-v4-custom-formats-anime
+    persistence:
+      config:
+        type: emptyDir
+        globalMounts:
+          - path: /config
+      config-file:
+        type: configMap
+        identifier: config
+        globalMounts:
+          - path: /config/recyclarr.yml
+            subPath: recyclarr.yml
+            readOnly: true

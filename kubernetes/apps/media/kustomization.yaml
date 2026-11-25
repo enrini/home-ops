@@ -11,3 +11,18 @@ resources:
   - ./namespace.yaml
   - ./plex/ks.yaml
   - ./scaleplex/ks.yaml
+  - ./postgres/ks.yaml
+  - ./qbittorrent/ks.yaml
+  - ./qui/ks.yaml
+  - ./sabnzbd/ks.yaml
+  - ./unpackerr/ks.yaml
+  - ./cleanuparr/ks.yaml
+  - ./byparr/ks.yaml
+  - ./prowlarr/ks.yaml
+  - ./radarr/ks.yaml
+  - ./sonarr/ks.yaml
+  - ./sonarr-anime/ks.yaml
+  - ./bazarr/ks.yaml
+  - ./seerr/ks.yaml
+  - ./recyclarr/ks.yaml
+  - ./plex-auto-languages/ks.yaml

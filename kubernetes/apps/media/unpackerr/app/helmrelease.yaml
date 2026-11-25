@@ -1,0 +1,60 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: unpackerr
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: unpackerr
+  interval: 1h
+  values:
+    controllers:
+      unpackerr:
+        strategy: RollingUpdate
+        containers:
+          app:
+            image:
+              repository: ghcr.io/unpackerr/unpackerr
+              tag: 1.0.1
+            env:
+              TZ: Europe/London
+              UN_FOLDERS_0_PATH: /data/torrents
+              UN_FOLDERS_0_EXTRACT_ISOS: "true"
+              UN_FOLDERS_0_DELETE_ORIGINAL: "false"
+              UN_FOLDERS_0_DELETE_AFTER: 10m
+              # Optional: add *arr API hooks via SOPS secret if you also want queue-driven extraction:
+              # UN_RADARR_0_URL: http://radarr.media.svc.cluster.local:7878
+              # UN_RADARR_0_PATHS_0: /data/torrents
+              # UN_SONARR_0_URL: http://sonarr.media.svc.cluster.local:8989
+              # UN_SONARR_0_PATHS_0: /data/torrents
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+            resources:
+              requests:
+                cpu: 50m
+                memory: 64Mi
+              limits:
+                memory: 512Mi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 100
+        fsGroup: 100
+        fsGroupChangePolicy: OnRootMismatch
+    persistence:
+      data:
+        type: persistentVolumeClaim
+        existingClaim: media-data
+        globalMounts:
+          - path: /data
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp

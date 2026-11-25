@@ -1,0 +1,10 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./ocirepository.yaml
+  - ./helmrelease.yaml
+  # Copy recyclarr-secret.sops.yaml.example -> recyclarr-secret.sops.yaml, fill in API keys,
+  # encrypt with `sops -e -i recyclarr-secret.sops.yaml`, uncomment below, and set suspend: false in helmrelease.yaml:
+  # - ./recyclarr-secret.sops.yaml
