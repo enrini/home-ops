@@ -25,6 +25,7 @@ spec:
               VERSION: docker
               DOCKER_MODS: ghcr.io/varashi/scaleplex_pms_dockermod:sha-0e6edae
               LOCAL_RELAY_PORT: "32499"
+              CLIENTFIX_LISTEN_ADDR: ":32498"
               SCALEPLEX_ORCHESTRATOR_URL: http://scaleplex-orchestrator.media.svc.cluster.local:3500
             probes:
               startup:
