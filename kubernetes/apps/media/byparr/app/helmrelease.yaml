@@ -36,10 +36,10 @@ spec:
                 custom: true
                 spec:
                   httpGet:
-                    path: /health
+                    path: /docs
                     port: *port
-                  periodSeconds: 10
-                  timeoutSeconds: 2
+                  periodSeconds: 15
+                  timeoutSeconds: 5
                   failureThreshold: 3
               readiness: *probes
               startup:
