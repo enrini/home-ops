@@ -1,0 +1,167 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cross-seed-indexer-sync
+  namespace: media
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cross-seed-indexer-sync
+  namespace: media
+rules:
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+    resourceNames:
+      - cross-seed
+    verbs:
+      - get
+      - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cross-seed-indexer-sync
+  namespace: media
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cross-seed-indexer-sync
+subjects:
+  - kind: ServiceAccount
+    name: cross-seed-indexer-sync
+    namespace: media
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cross-seed-indexer-sync
+  namespace: media
+spec:
+  schedule: "0 */6 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: cross-seed-indexer-sync
+          automountServiceAccountToken: true
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 100
+          containers:
+            - name: sync
+              image: ghcr.io/cross-seed/cross-seed:6.13.9
+              command:
+                - node
+                - -e
+              args:
+                - |
+                  const crypto = require("crypto");
+                  const fs = require("fs");
+                  const https = require("https");
+
+                  const prowlarrKey = process.env.PROWLARR_API_KEY;
+                  const token = fs.readFileSync("/var/run/secrets/kubernetes.io/serviceaccount/token", "utf8").trim();
+                  const ca = fs.readFileSync("/var/run/secrets/kubernetes.io/serviceaccount/ca.crt");
+
+                  function k8sRequest(method, path, body, contentType) {
+                    return new Promise((resolve, reject) => {
+                      const payload = body ? JSON.stringify(body) : null;
+                      const headers = {
+                        Authorization: `Bearer ${token}`,
+                        Accept: "application/json",
+                      };
+                      if (payload) {
+                        headers["Content-Type"] = contentType || "application/json";
+                        headers["Content-Length"] = Buffer.byteLength(payload);
+                      }
+                      const req = https.request(
+                        {
+                          hostname: "kubernetes.default.svc",
+                          port: 443,
+                          path,
+                          method,
+                          ca,
+                          headers,
+                        },
+                        (res) => {
+                          let data = "";
+                          res.on("data", (c) => (data += c));
+                          res.on("end", () => {
+                            if (res.statusCode < 200 || res.statusCode >= 300) {
+                              return reject(new Error(`K8s ${method} ${path}: HTTP ${res.statusCode} ${data}`));
+                            }
+                            resolve(JSON.parse(data));
+                          });
+                        }
+                      );
+                      req.on("error", reject);
+                      if (payload) req.write(payload);
+                      req.end();
+                    });
+                  }
+
+                  (async () => {
+                    const res = await fetch("http://prowlarr.media.svc.cluster.local:9696/api/v1/indexer", {
+                      headers: { "X-Api-Key": prowlarrKey },
+                    });
+                    if (!res.ok) throw new Error(`Prowlarr HTTP ${res.status}`);
+                    const indexers = await res.json();
+                    const urls = indexers
+                      .filter((i) => i.enable && i.protocol === "torrent")
+                      .map((i) => `http://prowlarr.media.svc.cluster.local:9696/${i.id}/api?apikey=${prowlarrKey}`)
+                      .sort();
+                    const hash = crypto.createHash("sha256").update(JSON.stringify(urls)).digest("hex");
+
+                    const deployPath = "/apis/apps/v1/namespaces/media/deployments/cross-seed";
+                    const dep = await k8sRequest("GET", deployPath);
+                    const current = dep?.spec?.template?.metadata?.annotations?.["cross-seed/indexers-hash"];
+                    if (current === hash) {
+                      console.log(`Indexers unchanged (${urls.length}); no rollout needed.`);
+                      return;
+                    }
+
+                    await k8sRequest(
+                      "PATCH",
+                      deployPath,
+                      {
+                        spec: {
+                          template: {
+                            metadata: {
+                              annotations: {
+                                "cross-seed/indexers-hash": hash,
+                              },
+                            },
+                          },
+                        },
+                      },
+                      "application/strategic-merge-patch+json"
+                    );
+                    console.log(`Updated cross-seed/indexers-hash to ${hash} (${urls.length} indexers); rollout triggered.`);
+                  })().catch((err) => {
+                    console.error(err);
+                    process.exit(1);
+                  });
+              envFrom:
+                - secretRef:
+                    name: arr-api-keys
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop:
+                    - ALL
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  memory: 96Mi

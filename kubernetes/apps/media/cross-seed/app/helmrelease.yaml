@@ -131,7 +131,7 @@ spec:
               : [];
 
             module.exports = {
-              apiKey: undefined,
+              apiKey: process.env.CROSS_SEED_API_KEY || undefined,
               host: "0.0.0.0",
               port: 2468,
               torznab,

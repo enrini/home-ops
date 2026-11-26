@@ -9,6 +9,7 @@ stringData:
   RADARR_API_KEY: ENC[AES256_GCM,data:le7pd8baAsQ8CmK9XaJcI9GHO//HwFMur+Q1cAXRD5A=,iv:tWu7oGrQ3zRlCfSJX/mDGI0aa9beM9h8Ji3vGzy5V64=,tag:CgBkEdOghxcid52kmG2Rgg==,type:str]
   SONARR_API_KEY: ENC[AES256_GCM,data:mUqpMkd0qr+qjt7tI6m+M796kIcXd31j01VYvtwzN2o=,iv:8BoQbc3yebgq2wKM+rgsi7ap3A8OgxQFTl7hFehYQ+U=,tag:6m8IenXed+Rtu9OONmOeCQ==,type:str]
   SONARR_ANIME_API_KEY: ENC[AES256_GCM,data:MzxelDR2VkWNqav8F/+OZ+fhwhVBxjGg1/CBGMtZ0J4=,iv:lVj7QA2satXnG94Zs/ydk6BSB9ePO655zflhWBmcW30=,tag:GStWBblqEnCCKmjLKACF1A==,type:str]
+  CROSS_SEED_API_KEY: ENC[AES256_GCM,data:6EkzvGK+x312BzTKlTdBC1b4WFWJCMG+8v2P7acGcK8=,iv:bcrbOisnxrA4nMOuSPQc7bksSL4KRmr4sK9GinrttbY=,tag:8vt57sBDAUyIItMLtVLoIQ==,type:str]
 sops:
   age:
     - enc: |
@@ -21,7 +22,7 @@ sops:
         -----END AGE ENCRYPTED FILE-----
       recipient: age1djuea8j8v5wysv7urq7qenceycxx5xayck0mate39ekz2mj8sf7q8us7wl
   encrypted_regex: ^(data|stringData)$
-  lastmodified: "2026-11-25T22:59:46Z"
-  mac: ENC[AES256_GCM,data:Ht8Cp6RBBImnSlMPm3VPS9zxQWGGCPYa38Qi7/8Z2EM3ADZ6cQWQQzGvQfEyHaMq3dj+PHl97Asa1MLsb2NeTmuGzgg40pLIvQ2oyqoNo7K1/9nmomPYDTlCZ+qibwdQ+nR2w0oUl2WkskXOsBXyA+oSJwqIg44o1wXL2uR3JTQ=,iv:kXk8O0btySXf12LXlFvpsaIHrMv+AHbAPo0nuaiuEeI=,tag:/K6luJbrTiNSSMwHIAdvHw==,type:str]
+  lastmodified: "2026-11-26T00:01:16Z"
+  mac: ENC[AES256_GCM,data:rlHZ0Y89YEJCFT7MYp/zf4CuqjlIVKA3LPQ9Fh+WcyjSST2qdk7fwXwI4LZYBBU7UXPzoPEbE/XN8k2719aTAmX8ZD4INg4Y/57IxvJsZLXizH81czagkVXbvseP/TOIeKdS22OS3NQKjjJJr1H0MQcUuf+PR2bH4FQHtRYNnpw=,iv:PY5Yu/SyCn5hcvn87hsQdXoSPhqW2IgBtPqqte5zPOo=,tag:+xck9jpankrjvvwqGtNdnA==,type:str]
   mac_only_encrypted: true
   version: 3.13.1

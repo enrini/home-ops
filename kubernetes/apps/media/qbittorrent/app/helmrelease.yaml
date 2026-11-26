@@ -14,6 +14,81 @@ spec:
       qbittorrent:
         strategy: Recreate
         initContainers:
+          init-config:
+            image:
+              repository: docker.io/library/busybox
+              tag: "1.37"
+            command:
+              - /bin/sh
+              - -c
+            args:
+              - |
+                set -eu
+                CONF_DIR="/config/qBittorrent"
+                CONF="${CONF_DIR}/qBittorrent.conf"
+                mkdir -p "$CONF_DIR"
+                touch "$CONF"
+
+                set_ini() {
+                  SECTION="$1" KEY="$2" VAL="$3" awk '
+                    BEGIN {
+                      sec = ENVIRON["SECTION"]
+                      key = ENVIRON["KEY"]
+                      val = ENVIRON["VAL"]
+                      in_sec = 0
+                      seen_sec = 0
+                      updated = 0
+                    }
+                    /^\[.*\]$/ {
+                      if (in_sec && !updated) {
+                        print key "=" val
+                        updated = 1
+                      }
+                      in_sec = ($0 == "[" sec "]")
+                      if (in_sec) seen_sec = 1
+                      print
+                      next
+                    }
+                    {
+                      if (in_sec && index($0, key "=") == 1) {
+                        print key "=" val
+                        updated = 1
+                        next
+                      }
+                      print
+                    }
+                    END {
+                      if (!seen_sec) {
+                        if (NR > 0) print ""
+                        print "[" sec "]"
+                        print key "=" val
+                      } else if (in_sec && !updated) {
+                        print key "=" val
+                      }
+                    }
+                  ' "$CONF" > "${CONF}.tmp" && mv "${CONF}.tmp" "$CONF"
+                }
+
+                set_ini "Preferences" 'WebUI\AuthSubnetWhitelistEnabled' "true"
+                set_ini "Preferences" 'WebUI\AuthSubnetWhitelist' "10.42.0.0/16"
+                set_ini "Preferences" 'WebUI\LocalHostAuth' "false"
+                set_ini "AutoRun" "enabled" "true"
+                set_ini "AutoRun" "program" '/bin/sh /scripts/cross-seed.sh "%I"'
+            securityContext:
+              runAsNonRoot: true
+              runAsUser: 1000
+              runAsGroup: 100
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+            resources:
+              requests:
+                cpu: 10m
+                memory: 16Mi
+              limits:
+                memory: 64Mi
           gluetun:
             image:
               repository: ghcr.io/qdm12/gluetun
@@ -74,6 +149,12 @@ spec:
             env:
               TZ: Europe/London
               QBT_WEBUI_PORT: &port 8080
+              CROSS_SEED_API_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: arr-api-keys
+                    key: CROSS_SEED_API_KEY
+                    optional: true
             probes:
               liveness: &probes
                 enabled: true
@@ -131,6 +212,21 @@ spec:
           - backendRefs:
               - identifier: app
                 port: *port
+    configMaps:
+      scripts:
+        data:
+          cross-seed.sh: |
+            #!/bin/sh
+            INFO_HASH="${1:-}"
+            [ -z "$INFO_HASH" ] && exit 0
+            [ -z "${CROSS_SEED_API_KEY:-}" ] && exit 0
+            URL="http://cross-seed.media.svc.cluster.local:2468/api/webhook"
+            if command -v curl >/dev/null 2>&1; then
+              curl -fsS -X POST "$URL" -H "X-Api-Key: ${CROSS_SEED_API_KEY}" --data-urlencode "infoHash=${INFO_HASH}" >/dev/null 2>&1 || true
+            elif command -v wget >/dev/null 2>&1; then
+              wget -q -O- --header="X-Api-Key: ${CROSS_SEED_API_KEY}" --post-data="infoHash=${INFO_HASH}" "$URL" >/dev/null 2>&1 || true
+            fi
+            exit 0
     persistence:
       config:
         type: persistentVolumeClaim
@@ -149,3 +245,9 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /tmp
+      scripts:
+        type: configMap
+        identifier: scripts
+        globalMounts:
+          - path: /scripts
+            readOnly: true
