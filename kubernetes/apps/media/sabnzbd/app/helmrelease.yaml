@@ -13,6 +13,48 @@ spec:
     controllers:
       sabnzbd:
         strategy: Recreate
+        initContainers:
+          init-config:
+            image:
+              repository: ghcr.io/home-operations/sabnzbd
+              tag: 5.1.3
+            command:
+              - /bin/sh
+              - -c
+            args:
+              - |
+                set -eu
+                INI="/config/sabnzbd.ini"
+                [ -f "$INI" ] || touch "$INI"
+                PY="python3"
+                [ -x /app/venv/bin/python ] && PY="/app/venv/bin/python"
+                "$PY" -c '
+                import sys
+                sys.path[:0] = ["/app"]
+                from configobj import ConfigObj
+                cfg = ConfigObj("/config/sabnzbd.ini", encoding="utf-8")
+                misc = cfg.setdefault("misc", {})
+                misc["download_dir"] = "/data/usenet/incomplete"
+                misc["complete_dir"] = "/data/usenet/complete"
+                cats = cfg.setdefault("categories", {})
+                for name in ("movies", "tv", "anime", "music"):
+                    cat = cats.setdefault(name, {})
+                    cat["name"] = name
+                    cat["dir"] = name
+                cfg.write()
+                '
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32Mi
+              limits:
+                memory: 128Mi
         containers:
           app:
             image:
@@ -21,6 +63,16 @@ spec:
             env:
               TZ: Europe/London
               SABNZBD__PORT: &port 8080
+              SABNZBD__API_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: arr-api-keys
+                    key: SABNZBD_API_KEY
+              SABNZBD__NZB_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: arr-api-keys
+                    key: SABNZBD_API_KEY
               SABNZBD__HOST_WHITELIST_ENTRIES: >-
                 sabnzbd,sabnzbd.media,sabnzbd.media.svc,sabnzbd.media.svc.cluster.local,sabnzbd.${SECRET_DOMAIN}
             probes:
