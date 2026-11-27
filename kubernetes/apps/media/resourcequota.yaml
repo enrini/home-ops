@@ -1,0 +1,8 @@
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: media-storage-quota
+spec:
+  hard:
+    requests.storage: 75Gi

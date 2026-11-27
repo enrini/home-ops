@@ -6,3 +6,6 @@ metadata:
 spec:
   bucketName: loki-data
   storageClassName: ceph-bucket
+  additionalConfig:
+    maxSize: "15Gi"
+    maxObjects: "500000"

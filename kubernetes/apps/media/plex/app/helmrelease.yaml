@@ -98,7 +98,7 @@ spec:
         forceRename: media-data
         storageClass: ceph-filesystem
         accessMode: ReadWriteMany
-        size: 50Gi
+        size: 20Gi
         retain: true
         globalMounts:
           - path: /data
@@ -107,7 +107,7 @@ spec:
         forceRename: plex-transcode
         storageClass: ceph-filesystem-scratch
         accessMode: ReadWriteMany
-        size: 20Gi
+        size: 5Gi
         retain: true
         globalMounts:
           - path: /transcode

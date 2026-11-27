@@ -47,7 +47,7 @@ spec:
               storageClassName: ceph-block
               resources:
                 requests:
-                  storage: 50Gi
+                  storage: 15Gi
     prometheus-node-exporter:
       fullnameOverride: node-exporter
     kube-state-metrics:

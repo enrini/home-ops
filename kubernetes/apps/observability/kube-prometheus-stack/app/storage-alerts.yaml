@@ -1,0 +1,55 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: storage-alerts
+spec:
+  groups:
+    - name: storage.rules
+      rules:
+        - alert: CephClusterNearFullWarning
+          expr: |
+            (ceph_cluster_total_used_bytes / ceph_cluster_total_bytes) > 0.65
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: Ceph cluster storage usage above 65%
+            description: Ceph raw storage is at {{ $value | humanizePercentage }} capacity.
+        - alert: CephClusterNearFullCritical
+          expr: |
+            (ceph_cluster_total_used_bytes / ceph_cluster_total_bytes) > 0.80
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: Ceph cluster storage usage above 80%
+            description: Ceph raw storage is at {{ $value | humanizePercentage }} capacity; writes freeze at 95%.
+        - alert: CephPoolNearFullWarning
+          expr: |
+            (ceph_pool_stored_raw / (ceph_pool_stored_raw + ceph_pool_max_avail)) > 0.65
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: Ceph pool {{ $labels.name }} usage above 65%
+            description: Ceph pool {{ $labels.name }} is at {{ $value | humanizePercentage }} capacity.
+        - alert: PersistentVolumeClaimNearFullWarning
+          expr: |
+            (kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes) > 0.75
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} usage above 75%
+            description: PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} is {{ $value | humanizePercentage }} full.
+        - alert: PersistentVolumeClaimNearFullCritical
+          expr: |
+            (kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes) > 0.85
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} usage above 85%
+            description: PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} is {{ $value | humanizePercentage }} full.

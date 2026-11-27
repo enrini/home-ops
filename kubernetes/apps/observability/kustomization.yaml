@@ -9,6 +9,7 @@ components:
 
 resources:
   - ./namespace.yaml
+  - ./resourcequota.yaml
   - ./kube-prometheus-stack/ks.yaml
   - ./loki/ks.yaml
   - ./alloy/ks.yaml
