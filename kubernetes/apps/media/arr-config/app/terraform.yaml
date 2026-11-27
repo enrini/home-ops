@@ -31,3 +31,9 @@ spec:
       varsKeys:
         - SABNZBD_API_KEY
       optional: true
+    - kind: Secret
+      name: arr-api-keys
+      varsKeys:
+        - NAVIDROME_USERNAME
+        - NAVIDROME_PASSWORD
+      optional: true

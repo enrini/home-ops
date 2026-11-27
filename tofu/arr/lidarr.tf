@@ -101,3 +101,21 @@ resource "restapi_object" "lidarr_sabnzbd" {
     replace_triggered_by = [terraform_data.lidarr_sabnzbd_spec[0]]
   }
 }
+
+resource "lidarr_notification_subsonic" "navidrome" {
+  count             = var.NAVIDROME_USERNAME != "" && var.NAVIDROME_PASSWORD != "" ? 1 : 0
+  name              = "Navidrome"
+  host              = "navidrome.media.svc.cluster.local"
+  port              = 4533
+  use_ssl           = false
+  username          = var.NAVIDROME_USERNAME
+  password          = var.NAVIDROME_PASSWORD
+  update_library    = true
+  notify            = true
+  on_release_import = true
+  on_upgrade        = true
+  on_rename         = true
+  on_track_retag    = true
+  on_album_delete   = true
+  on_artist_delete  = true
+}

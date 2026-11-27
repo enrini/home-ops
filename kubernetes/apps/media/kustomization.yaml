@@ -25,6 +25,7 @@ resources:
   - ./sonarr/ks.yaml
   - ./sonarr-anime/ks.yaml
   - ./lidarr/ks.yaml
+  - ./navidrome/ks.yaml
   - ./arr-config/ks.yaml
   - ./bazarr/ks.yaml
   - ./seerr/ks.yaml

@@ -28,3 +28,15 @@ variable "SABNZBD_API_KEY" {
   sensitive = true
   default   = ""
 }
+
+variable "NAVIDROME_USERNAME" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
+
+variable "NAVIDROME_PASSWORD" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
