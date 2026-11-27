@@ -23,3 +23,14 @@ provider "lidarr" {
   url     = "http://lidarr.media.svc.cluster.local:8686"
   api_key = var.LIDARR_API_KEY
 }
+
+provider "restapi" {
+  alias                = "lidarr"
+  uri                  = "http://lidarr.media.svc.cluster.local:8686"
+  write_returns_object = true
+  id_attribute         = "id"
+  headers = {
+    "Content-Type" = "application/json"
+    "X-Api-Key"    = var.LIDARR_API_KEY
+  }
+}

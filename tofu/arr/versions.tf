@@ -18,5 +18,9 @@ terraform {
       source  = "devopsarr/lidarr"
       version = "~> 1.13"
     }
+    restapi = {
+      source  = "Mastercard/restapi"
+      version = "~> 1.20"
+    }
   }
 }
