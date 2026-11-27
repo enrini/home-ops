@@ -18,10 +18,9 @@ resource "terraform_data" "lidarr_qbittorrent_spec" {
 }
 
 resource "restapi_object" "lidarr_qbittorrent" {
-  provider                  = restapi.lidarr
-  path                      = "/api/v1/downloadclient"
-  id_attribute              = "id"
-  ignore_all_server_changes = true
+  provider     = restapi.lidarr
+  path         = "/api/v1/downloadclient"
+  id_attribute = "id"
 
   data = jsonencode({
     enable                   = true
@@ -68,11 +67,10 @@ resource "terraform_data" "lidarr_sabnzbd_spec" {
 }
 
 resource "restapi_object" "lidarr_sabnzbd" {
-  provider                  = restapi.lidarr
-  count                     = var.SABNZBD_API_KEY != "" ? 1 : 0
-  path                      = "/api/v1/downloadclient"
-  id_attribute              = "id"
-  ignore_all_server_changes = true
+  provider     = restapi.lidarr
+  count        = var.SABNZBD_API_KEY != "" ? 1 : 0
+  path         = "/api/v1/downloadclient"
+  id_attribute = "id"
 
   data = jsonencode({
     enable                   = true
@@ -93,8 +91,8 @@ resource "restapi_object" "lidarr_sabnzbd" {
       { name = "username", value = "" },
       { name = "password", value = "" },
       { name = "musicCategory", value = "music" },
-      { name = "recentMusicPriority", value = 0 },
-      { name = "olderMusicPriority", value = 0 },
+      { name = "recentMusicPriority", value = -100 },
+      { name = "olderMusicPriority", value = -100 },
     ]
   })
 
