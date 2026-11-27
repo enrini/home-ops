@@ -74,6 +74,30 @@ spec:
                 set_ini "Preferences" 'WebUI\LocalHostAuth' "false"
                 set_ini "AutoRun" "enabled" "true"
                 set_ini "AutoRun" "program" '/bin/sh /scripts/cross-seed.sh "%I"'
+                set_ini "BitTorrent" 'Session\DefaultSavePath' "/data/torrents"
+                set_ini "BitTorrent" 'Session\DisableAutoTMMByDefault' "false"
+                set_ini "BitTorrent" 'Session\DisableAutoTMMTriggers\CategorySavePathChanged' "false"
+                set_ini "BitTorrent" 'Session\DisableAutoTMMTriggers\DefaultSavePathChanged' "false"
+
+                cat > "${CONF_DIR}/categories.json" <<'EOF'
+                {
+                  "anime": {
+                    "save_path": "/data/torrents/anime"
+                  },
+                  "cross-seed": {
+                    "save_path": "/data/torrents/cross-seed"
+                  },
+                  "movies": {
+                    "save_path": "/data/torrents/movies"
+                  },
+                  "music": {
+                    "save_path": "/data/torrents/music"
+                  },
+                  "tv": {
+                    "save_path": "/data/torrents/tv"
+                  }
+                }
+                EOF
             securityContext:
               runAsNonRoot: true
               runAsUser: 1000

@@ -27,14 +27,17 @@ spec:
                 /data/torrents/movies
                 /data/torrents/tv
                 /data/torrents/anime
+                /data/torrents/music
                 /data/torrents/cross-seed
                 /data/usenet/incomplete
                 /data/usenet/complete/movies
                 /data/usenet/complete/tv
                 /data/usenet/complete/anime
+                /data/usenet/complete/music
                 /data/media/movies
                 /data/media/tv
                 /data/media/anime
+                /data/media/music
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true

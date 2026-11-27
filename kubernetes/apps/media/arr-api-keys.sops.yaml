@@ -10,6 +10,8 @@ stringData:
   SONARR_API_KEY: ENC[AES256_GCM,data:mUqpMkd0qr+qjt7tI6m+M796kIcXd31j01VYvtwzN2o=,iv:8BoQbc3yebgq2wKM+rgsi7ap3A8OgxQFTl7hFehYQ+U=,tag:6m8IenXed+Rtu9OONmOeCQ==,type:str]
   SONARR_ANIME_API_KEY: ENC[AES256_GCM,data:MzxelDR2VkWNqav8F/+OZ+fhwhVBxjGg1/CBGMtZ0J4=,iv:lVj7QA2satXnG94Zs/ydk6BSB9ePO655zflhWBmcW30=,tag:GStWBblqEnCCKmjLKACF1A==,type:str]
   CROSS_SEED_API_KEY: ENC[AES256_GCM,data:6EkzvGK+x312BzTKlTdBC1b4WFWJCMG+8v2P7acGcK8=,iv:bcrbOisnxrA4nMOuSPQc7bksSL4KRmr4sK9GinrttbY=,tag:8vt57sBDAUyIItMLtVLoIQ==,type:str]
+  LIDARR_API_KEY: ENC[AES256_GCM,data:mlVCBKnFzXLYX5RPrgAwbWHhJkk+upOP1OBtdkGcvC0=,iv:u3zgWiY/1PS0okxH+aBEfIdSPxE2A9VpJzIOJjGZ78c=,tag:vTNXTTr1N/sRKEy7A3CNXw==,type:str]
+  SABNZBD_API_KEY: ENC[AES256_GCM,data:vyRX2Ts5xOicS1HJIkGTTt6PUv3J1Lx9B3o4w6uHjqg=,iv:cRkQePBlrVtL+ofYHEJbnM2u/0OSMYvoDzSBVq26bic=,tag:cX7Di0IP0wO1GVA74oPITg==,type:str]
 sops:
   age:
     - enc: |
@@ -22,7 +24,7 @@ sops:
         -----END AGE ENCRYPTED FILE-----
       recipient: age1djuea8j8v5wysv7urq7qenceycxx5xayck0mate39ekz2mj8sf7q8us7wl
   encrypted_regex: ^(data|stringData)$
-  lastmodified: "2026-11-26T00:01:16Z"
-  mac: ENC[AES256_GCM,data:rlHZ0Y89YEJCFT7MYp/zf4CuqjlIVKA3LPQ9Fh+WcyjSST2qdk7fwXwI4LZYBBU7UXPzoPEbE/XN8k2719aTAmX8ZD4INg4Y/57IxvJsZLXizH81czagkVXbvseP/TOIeKdS22OS3NQKjjJJr1H0MQcUuf+PR2bH4FQHtRYNnpw=,iv:PY5Yu/SyCn5hcvn87hsQdXoSPhqW2IgBtPqqte5zPOo=,tag:+xck9jpankrjvvwqGtNdnA==,type:str]
+  lastmodified: "2026-11-27T13:57:20Z"
+  mac: ENC[AES256_GCM,data:ItZAi+7jEgf/scJ11md17/YZshD+b8nQ071hn4SXKwPLkMhR5UN3wBuw7I1LPJmgcUUzR5qShap7/7+xImnsIHVQfKJpvV8tbcNpTdKMg1oufYJ8FXqLk9n9CKSrMX2tzUl7MWiOmwJ6eIR35OV7oo3nq4M7b7Dy2cdo0xwwaBs=,iv:4pUpUQsKuGw+Z81HsnxnaiW1FjORRfvUYEZSpbXrQ2s=,tag:wU9QvB+w3ga9f90qZTCN7w==,type:str]
   mac_only_encrypted: true
   version: 3.13.1

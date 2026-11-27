@@ -1,0 +1,33 @@
+---
+apiVersion: infra.contrib.fluxcd.io/v1alpha2
+kind: Terraform
+metadata:
+  name: arr-config
+  namespace: media
+spec:
+  interval: 1h
+  retryInterval: 2m
+  approvePlan: auto
+  path: ./tofu/arr
+  serviceAccountName: tf-runner
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  backendConfig:
+    secretSuffix: arr-config
+    inClusterConfig: true
+  varsFrom:
+    - kind: Secret
+      name: arr-api-keys
+      varsKeys:
+        - PROWLARR_API_KEY
+        - RADARR_API_KEY
+        - SONARR_API_KEY
+        - SONARR_ANIME_API_KEY
+        - LIDARR_API_KEY
+    - kind: Secret
+      name: arr-api-keys
+      varsKeys:
+        - SABNZBD_API_KEY
+      optional: true

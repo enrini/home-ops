@@ -118,3 +118,27 @@ spec:
   owner: app
   cluster:
     name: postgres-media
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/database_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: lidarr-main
+  namespace: media
+spec:
+  name: lidarr_main
+  owner: app
+  cluster:
+    name: postgres-media
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/database_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: lidarr-log
+  namespace: media
+spec:
+  name: lidarr_log
+  owner: app
+  cluster:
+    name: postgres-media
