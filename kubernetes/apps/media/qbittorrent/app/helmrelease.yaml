@@ -25,7 +25,7 @@ spec:
               - |
                 set -eu
                 CONF_DIR="/config/qBittorrent"
-                CONF="${CONF_DIR}/qBittorrent.conf"
+                CONF="$CONF_DIR/qBittorrent.conf"
                 mkdir -p "$CONF_DIR"
                 touch "$CONF"
 
@@ -66,7 +66,7 @@ spec:
                         print key "=" val
                       }
                     }
-                  ' "$CONF" > "${CONF}.tmp" && mv "${CONF}.tmp" "$CONF"
+                  ' "$CONF" > "$CONF.tmp" && mv "$CONF.tmp" "$CONF"
                 }
 
                 set_ini "Preferences" 'WebUI\AuthSubnetWhitelistEnabled' "true"
@@ -79,7 +79,7 @@ spec:
                 set_ini "BitTorrent" 'Session\DisableAutoTMMTriggers\CategorySavePathChanged' "false"
                 set_ini "BitTorrent" 'Session\DisableAutoTMMTriggers\DefaultSavePathChanged' "false"
 
-                cat > "${CONF_DIR}/categories.json" <<'EOF'
+                cat > "$CONF_DIR/categories.json" <<'EOF'
                 {
                   "anime": {
                     "save_path": "/data/torrents/anime"
@@ -240,14 +240,14 @@ spec:
         data:
           cross-seed.sh: |
             #!/bin/sh
-            INFO_HASH="${1:-}"
+            INFO_HASH="$1"
             [ -z "$INFO_HASH" ] && exit 0
-            [ -z "${CROSS_SEED_API_KEY:-}" ] && exit 0
+            [ -z "$CROSS_SEED_API_KEY" ] && exit 0
             URL="http://cross-seed.media.svc.cluster.local:2468/api/webhook"
             if command -v curl >/dev/null 2>&1; then
-              curl -fsS -X POST "$URL" -H "X-Api-Key: ${CROSS_SEED_API_KEY}" --data-urlencode "infoHash=${INFO_HASH}" >/dev/null 2>&1 || true
+              curl -fsS -X POST "$URL" -H "X-Api-Key: $CROSS_SEED_API_KEY" --data-urlencode "infoHash=$INFO_HASH" >/dev/null 2>&1 || true
             elif command -v wget >/dev/null 2>&1; then
-              wget -q -O- --header="X-Api-Key: ${CROSS_SEED_API_KEY}" --post-data="infoHash=${INFO_HASH}" "$URL" >/dev/null 2>&1 || true
+              wget -q -O- --header="X-Api-Key: $CROSS_SEED_API_KEY" --post-data="infoHash=$INFO_HASH" "$URL" >/dev/null 2>&1 || true
             fi
             exit 0
     persistence:
