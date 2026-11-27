@@ -1,0 +1,5 @@
+---
+apiVersion: v1alpha1
+kind: KmsgLogConfig
+name: loki-kmsg
+url: tcp://192.168.1.138:6051/

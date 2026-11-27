@@ -1,0 +1,222 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: alloy-cluster
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: alloy
+      version: 1.16.0
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+  values:
+    controller:
+      type: deployment
+      replicas: 1
+    alloy:
+      stabilityLevel: experimental
+      extraPorts:
+        - name: talos-service
+          port: 6050
+          targetPort: 6050
+          protocol: TCP
+        - name: talos-kernel
+          port: 6051
+          targetPort: 6051
+          protocol: TCP
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          memory: 512Mi
+      configMap:
+        create: true
+        content: |-
+          loki.write "default" {
+            endpoint {
+              url = "http://loki-gateway.observability.svc.cluster.local/loki/api/v1/push"
+            }
+          }
+
+          loki.source.kubernetes_events "cluster_events" {
+            job_name   = "kubernetes-events"
+            log_format = "json"
+            forward_to = [loki.write.default.receiver]
+          }
+
+          // Talos service logs (machine.logging.destinations -> tcp://192.168.1.138:6050/)
+          otelcol.receiver.tcplog "talos_service" {
+            listen_address = "0.0.0.0:6050"
+            add_attributes = true
+            encoding       = "utf-8"
+            output {
+              logs = [otelcol.processor.attributes.talos_service.input]
+            }
+          }
+
+          otelcol.processor.attributes "talos_service" {
+            action {
+              key    = "loki.attribute.labels"
+              action = "insert"
+              value  = "net.peer.ip"
+            }
+            output {
+              logs = [otelcol.exporter.loki.talos_service.input]
+            }
+          }
+
+          otelcol.exporter.loki "talos_service" {
+            forward_to = [loki.process.talos_service.receiver]
+          }
+
+          loki.process "talos_service" {
+            stage.static_labels {
+              values = {
+                job = "talos-service",
+              }
+            }
+
+            stage.match {
+              selector = "{job=\"talos-service\"} |= \"\\\"body\\\":\""
+              stage.json {
+                expressions = {
+                  body = "body",
+                }
+              }
+              stage.output {
+                source = "body"
+              }
+            }
+
+            stage.template {
+              source   = "node"
+              template = "{{ `{{ if eq .net_peer_ip \"192.168.1.129\" }}k8s-0{{ else if eq .net_peer_ip \"192.168.1.130\" }}k8s-1{{ else if eq .net_peer_ip \"192.168.1.131\" }}k8s-2{{ else }}{{ .net_peer_ip }}{{ end }}` }}"
+            }
+
+            stage.json {
+              expressions = {
+                msg           = "msg",
+                talos_level   = "\"talos-level\"",
+                talos_service = "\"talos-service\"",
+                talos_time    = "\"talos-time\"",
+              }
+            }
+
+            stage.labels {
+              values = {
+                level   = "talos_level",
+                service = "talos_service",
+                node    = "",
+              }
+            }
+
+            stage.label_drop {
+              values = ["net_peer_ip"]
+            }
+
+            stage.timestamp {
+              source = "talos_time"
+              format = "RFC3339Nano"
+            }
+
+            stage.output {
+              source = "msg"
+            }
+
+            forward_to = [loki.write.default.receiver]
+          }
+
+          // Talos kernel logs (KmsgLogConfig -> tcp://192.168.1.138:6051/)
+          otelcol.receiver.tcplog "talos_kernel" {
+            listen_address = "0.0.0.0:6051"
+            add_attributes = true
+            encoding       = "utf-8"
+            output {
+              logs = [otelcol.processor.attributes.talos_kernel.input]
+            }
+          }
+
+          otelcol.processor.attributes "talos_kernel" {
+            action {
+              key    = "loki.attribute.labels"
+              action = "insert"
+              value  = "net.peer.ip"
+            }
+            output {
+              logs = [otelcol.exporter.loki.talos_kernel.input]
+            }
+          }
+
+          otelcol.exporter.loki "talos_kernel" {
+            forward_to = [loki.process.talos_kernel.receiver]
+          }
+
+          loki.process "talos_kernel" {
+            stage.static_labels {
+              values = {
+                job = "talos-kernel",
+              }
+            }
+
+            stage.match {
+              selector = "{job=\"talos-kernel\"} |= \"\\\"body\\\":\""
+              stage.json {
+                expressions = {
+                  body = "body",
+                }
+              }
+              stage.output {
+                source = "body"
+              }
+            }
+
+            stage.template {
+              source   = "node"
+              template = "{{ `{{ if eq .net_peer_ip \"192.168.1.129\" }}k8s-0{{ else if eq .net_peer_ip \"192.168.1.130\" }}k8s-1{{ else if eq .net_peer_ip \"192.168.1.131\" }}k8s-2{{ else }}{{ .net_peer_ip }}{{ end }}` }}"
+            }
+
+            stage.json {
+              expressions = {
+                msg         = "msg",
+                facility    = "facility",
+                talos_level = "\"talos-level\"",
+                talos_time  = "\"talos-time\"",
+              }
+            }
+
+            stage.labels {
+              values = {
+                level    = "talos_level",
+                facility = "",
+                node     = "",
+              }
+            }
+
+            stage.label_drop {
+              values = ["net_peer_ip"]
+            }
+
+            stage.timestamp {
+              source = "talos_time"
+              format = "RFC3339Nano"
+            }
+
+            stage.output {
+              source = "msg"
+            }
+
+            forward_to = [loki.write.default.receiver]
+          }
+    service:
+      enabled: true
+      type: LoadBalancer
+      externalTrafficPolicy: Local
+      annotations:
+        lbipam.cilium.io/ips: "192.168.1.138"
+    serviceMonitor:
+      enabled: true

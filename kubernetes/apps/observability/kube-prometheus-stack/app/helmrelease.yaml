@@ -53,4 +53,56 @@ spec:
     kube-state-metrics:
       fullnameOverride: kube-state-metrics
     grafana:
-      enabled: false
+      enabled: true
+      fullnameOverride: grafana
+      admin:
+        existingSecret: grafana-admin-secret
+        userKey: admin-user
+        passwordKey: admin-password
+      grafana.ini:
+        analytics:
+          check_for_updates: false
+          reporting_enabled: false
+        auth.anonymous:
+          enabled: false
+        security:
+          cookie_secure: true
+          cookie_samesite: lax
+          disable_gravatar: true
+        server:
+          root_url: "https://grafana.${SECRET_DOMAIN}"
+        users:
+          allow_org_create: false
+          allow_sign_up: false
+      persistence:
+        enabled: true
+        type: sts
+        storageClassName: ceph-block
+        accessModes:
+          - ReadWriteOnce
+        size: 5Gi
+      sidecar:
+        dashboards:
+          enabled: true
+          searchNamespace: ALL
+          label: grafana_dashboard
+          labelValue: "1"
+        datasources:
+          enabled: true
+          searchNamespace: ALL
+      additionalDataSources:
+        - name: Loki
+          type: loki
+          uid: loki
+          access: proxy
+          url: http://loki-gateway.observability.svc.cluster.local
+          jsonData:
+            maxLines: 1000
+      serviceMonitor:
+        enabled: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 256Mi
+        limits:
+          memory: 1Gi
